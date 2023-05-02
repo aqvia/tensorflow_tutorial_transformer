@@ -26,4 +26,35 @@ tf.keras.utils.get_file(
     extract=True
 )
 tokenizers = tf.saved_model.load(model_name)
-print([item for item in dir(tokenizers.en) if not item.startswith('_')])
+# print([item for item in dir(tokenizers.en) if not item.startswith('_')])
+
+# set up a data pipeline with tf.data
+MAX_TOKENS = 128
+
+
+def prepare_batch(pt, en):
+    """テキストのバッチを入力として、訓練データの形式で返す
+    """
+    pt = tokenizers.pt.tokenize(pt)
+    pt = pt[:, :MAX_TOKENS]
+    pt = pt.to_tensor()
+
+    en = tokenizers.en.tokenize(en)
+    en = en[:, :(MAX_TOKENS+1)]
+    en_inputs = en[:, :-1].to_tensor()
+    en_labels = en[:, 1:].to_tensor()
+
+    return (pt, en_inputs), en_labels
+
+
+BUFFER_SIZE = 20000
+BATCH_SIZE = 64
+
+
+def make_batches(ds):
+    return (
+        ds
+        .shuffle(BUFFER_SIZE)
+        .batch(BATCH_SIZE)
+        .map(prepare_batch, tf.data.AUTOTUNE)
+        .prefetch(buffer_size=tf.data.AUTOTUNE))
