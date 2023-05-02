@@ -2,6 +2,8 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 import tensorflow_text
 
+from positional_embedding import PositionalEmbedding
+
 examples, metadata = tfds.load(
     'ted_hrlr_translate/pt_to_en', with_info=True, as_supervised=True)
 train_examples, val_examples = examples['train'], examples['validation']
@@ -67,8 +69,19 @@ val_batches = make_batches(val_examples)
 for (pt, en), en_labels in train_batches.take(1):
     break
 
-print(pt.shape)
-print(en.shape)
-print(en_labels.shape)
-print(en[0][:10])
-print(en_labels[0][:10])
+# print(pt.shape)
+# print(en.shape)
+# print(en_labels.shape)
+# print(en[0][:10])
+# print(en_labels[0][:10])
+
+
+# The embedding and positional encoding layer
+embed_pt = PositionalEmbedding(
+    vocab_size=tokenizers.pt.get_vocab_size(), d_model=512)
+embed_en = PositionalEmbedding(
+    vocab_size=tokenizers.en.get_vocab_size(), d_model=512)
+
+pt_emb = embed_pt(pt)
+en_emb = embed_en(en)
+print(en_emb._keras_mask)
