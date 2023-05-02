@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 tensorflow-datasets = "*"
 tensorflow = "*"
+tensorflow-text = "*"
 
 [dev-packages]
 
