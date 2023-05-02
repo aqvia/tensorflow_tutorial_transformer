@@ -58,3 +58,17 @@ def make_batches(ds):
         .batch(BATCH_SIZE)
         .map(prepare_batch, tf.data.AUTOTUNE)
         .prefetch(buffer_size=tf.data.AUTOTUNE))
+
+
+# test the dataset
+train_batches = make_batches(train_examples)
+val_batches = make_batches(val_examples)
+
+for (pt, en), en_labels in train_batches.take(1):
+    break
+
+print(pt.shape)
+print(en.shape)
+print(en_labels.shape)
+print(en[0][:10])
+print(en_labels[0][:10])
