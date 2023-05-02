@@ -2,7 +2,8 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 import tensorflow_text
 
-examples, metadata = tfds.load('ted_hrlr_translate/pt_to_en', with_info=True, as_supervised=True)
+examples, metadata = tfds.load(
+    'ted_hrlr_translate/pt_to_en', with_info=True, as_supervised=True)
 train_examples, val_examples = examples['train'], examples['validation']
 
 # for pt_examples, en_examples in train_examples.batch(3).take(1):
