@@ -3,6 +3,8 @@ import tensorflow_datasets as tfds
 import tensorflow_text
 
 from transformer import Transformer
+from custom_schedule import CustomSchedule
+from loss_and_metrics import masked_accuracy, masked_loss
 
 examples, metadata = tfds.load(
     'ted_hrlr_translate/pt_to_en', with_info=True, as_supervised=True)
@@ -101,3 +103,17 @@ attn_scores = transformer.decoder.dec_layers[-1].last_attn_scores
 print(attn_scores.shape)  # (batch, heads, target_seq, input_seq)
 
 transformer.summary()
+
+
+# Training
+# set up the optimizer
+learning_rate = CustomSchedule(d_model)
+optimizer = tf.keras.optimizers.Adam(
+    learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
+
+transformer.compile(
+    loss=masked_loss,
+    optimizer=optimizer,
+    metrics=[masked_accuracy]
+)
+transformer.fit(train_batches, epochs=20, validation_data=val_batches)
