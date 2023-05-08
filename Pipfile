@@ -11,6 +11,7 @@ tensorflow-text = "*"
 [dev-packages]
 flake8 = "*"
 autopep8 = "*"
+matplotlib = "*"
 
 [requires]
 python_version = "3.11"

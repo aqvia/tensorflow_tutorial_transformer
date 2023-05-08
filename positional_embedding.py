@@ -1,6 +1,8 @@
 import numpy as np
 import tensorflow as tf
 
+import matplotlib.pyplot as plt
+
 
 def positional_encoding(length, depth):
     depth = depth/2
@@ -36,3 +38,31 @@ class PositionalEmbedding(tf.keras.layers.Layer):
         x *= tf.math.sqrt(tf.cast(self.d_model, tf.float32))
         x = x + self.pos_encoding[tf.newaxis, :length, :]
         return x
+
+
+if __name__ == '__main__':
+    pos_encoding = positional_encoding(length=2048, depth=512)
+
+    # Check the shape.
+    print(pos_encoding.shape)
+
+    # # Plot the dimensions.
+    # plt.pcolormesh(pos_encoding.numpy().T, cmap='RdBu')
+    # plt.ylabel('Depth')
+    # plt.xlabel('Position')
+    # plt.colorbar()
+    # plt.show()
+
+    pos_encoding /= tf.norm(pos_encoding, axis=1, keepdims=True)
+    p = pos_encoding[1000]
+    dots = tf.einsum('pd,d -> p', pos_encoding, p)
+    plt.subplot(2, 1, 1)
+    plt.plot(dots)
+    plt.ylim([0, 1])
+    plt.plot([950, 950, float('nan'), 1050, 1050],
+             [0, 1, float('nan'), 0, 1], color='k', label='Zoom')
+    plt.legend()
+    plt.subplot(2, 1, 2)
+    plt.plot(dots)
+    plt.xlim([950, 1050])
+    plt.ylim([0, 1])
