@@ -7,6 +7,15 @@ from decoder_layer import DecoderLayer
 class Decoder(tf.keras.layers.Layer):
     def __init__(self, *, num_layers, d_model, num_heads, dff, vocab_size,
                  dropout_rate=0.1):
+        """
+        Args:
+            num_layers (integer): num of layers
+            d_model (integer): dimension of the embedding
+            num_heads (integer): number of attention heads
+            dff (integer): dimension of the feedforward
+            vocab_size (integer): size of the vocabulary
+            dropout_rate (float, optional): dropout probability. Defaults to 0.1.
+        """
         super(Decoder, self).__init__()
 
         self.d_model = d_model
@@ -15,6 +24,7 @@ class Decoder(tf.keras.layers.Layer):
         self.pos_embedding = PositionalEmbedding(
             vocab_size=vocab_size, d_model=d_model)
         self.dropout = tf.keras.layers.Dropout(dropout_rate)
+
         self.dec_layers = [
             DecoderLayer(d_model=d_model, num_heads=num_heads,
                          dff=dff, dropout_rate=dropout_rate)

@@ -7,6 +7,15 @@ from encoder_layer import EncoderLayer
 class Encoder(tf.keras.layers.Layer):
     def __init__(self, *, num_layers, d_model, num_heads, dff, vocab_size,
                  dropout_rate=0.1):
+        """
+        Args:
+            num_layers (integer): num of layers
+            d_model (integer): dimension of the embedding
+            num_heads (integer): number of attention heads
+            dff (integer): dimension of the feedforward
+            vocab_size (integer): size of the vocabulary
+            dropout_rate (float, optional): dropout probability. Defaults to 0.1.
+        """
         super().__init__()
 
         self.d_model = d_model
@@ -14,12 +23,12 @@ class Encoder(tf.keras.layers.Layer):
 
         self.pos_embedding = PositionalEmbedding(
             vocab_size=vocab_size, d_model=d_model)
+        self.dropout = tf.keras.layers.Dropout(dropout_rate)
 
         self.enc_layers = [
             EncoderLayer(d_model=d_model, num_heads=num_heads,
                          dff=dff, dropout_rate=dropout_rate)
             for _ in range(num_layers)]
-        self.dropout = tf.keras.layers.Dropout(dropout_rate)
 
     def call(self, x):
         # `x` is token-IDs shape: (batch, seq_len)

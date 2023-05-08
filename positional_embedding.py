@@ -22,6 +22,11 @@ def positional_encoding(length, depth):
 
 class PositionalEmbedding(tf.keras.layers.Layer):
     def __init__(self, vocab_size, d_model):
+        """
+        Args:
+            vocab_size (integer): size of the vocabulary
+            d_model (integer): dimension of the embedding
+        """
         super().__init__()
         self.d_model = d_model
         self.embedding = tf.keras.layers.Embedding(
@@ -34,7 +39,7 @@ class PositionalEmbedding(tf.keras.layers.Layer):
     def call(self, x):
         length = tf.shape(x)[1]
         x = self.embedding(x)
-        # This factor sets the relative scale of the embedding and positonal_encoding.
+        # この係数は、embeddingとpositonal_encodingの相対的なスケールを設定する
         x *= tf.math.sqrt(tf.cast(self.d_model, tf.float32))
         x = x + self.pos_encoding[tf.newaxis, :length, :]
         return x
