@@ -2,9 +2,11 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 import tensorflow_text
 
+from . import MAX_TOKENS
 from transformer import Transformer
 from custom_schedule import CustomSchedule
 from loss_and_metrics import masked_accuracy, masked_loss
+from translator import Translator, print_translation
 
 examples, metadata = tfds.load(
     'ted_hrlr_translate/pt_to_en', with_info=True, as_supervised=True)
@@ -33,7 +35,6 @@ tokenizers = tf.saved_model.load(model_name)
 # print([item for item in dir(tokenizers.en) if not item.startswith('_')])
 
 # set up a data pipeline with tf.data
-MAX_TOKENS = 128
 
 
 def prepare_batch(pt, en):
@@ -117,3 +118,14 @@ transformer.compile(
     metrics=[masked_accuracy]
 )
 transformer.fit(train_batches, epochs=20, validation_data=val_batches)
+
+# run
+translator = Translator(tokenizers, transformer)
+
+# example
+sentence = 'este é um problema que temos que resolver.'
+ground_truth = 'this is a problem we have to solve .'
+
+translated_text, translated_tokens, attention_weights = translator(
+    tf.constant(sentence))
+print_translation(sentence, translated_text, ground_truth)
