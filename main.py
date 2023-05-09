@@ -8,6 +8,7 @@ from custom_schedule import CustomSchedule
 from loss_and_metrics import masked_accuracy, masked_loss
 from translator import Translator, print_translation
 from create_attention_plots import plot_attention_head, plot_attention_weights
+from export_translator import ExportTranslator
 
 examples, metadata = tfds.load(
     'ted_hrlr_translate/pt_to_en', with_info=True, as_supervised=True)
@@ -144,3 +145,8 @@ in_tokens = tokenizers.pt.lookup(in_tokens)[0]
 plot_attention_head(in_tokens, translated_tokens, attention)
 plot_attention_weights(sentence, translated_tokens,
                        attention_weights[0], tokenizers)
+
+# Export the model
+translator = ExportTranslator(translator)
+tf.saved_model.save(translator, export_dir='translator')
+reloaded = tf.saved_model.load('translator')
