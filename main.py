@@ -7,6 +7,7 @@ from transformer import Transformer
 from custom_schedule import CustomSchedule
 from loss_and_metrics import masked_accuracy, masked_loss
 from translator import Translator, print_translation
+from create_attention_plots import plot_attention_head, plot_attention_weights
 
 examples, metadata = tfds.load(
     'ted_hrlr_translate/pt_to_en', with_info=True, as_supervised=True)
@@ -129,3 +130,17 @@ ground_truth = 'this is a problem we have to solve .'
 translated_text, translated_tokens, attention_weights = translator(
     tf.constant(sentence))
 print_translation(sentence, translated_text, ground_truth)
+
+# create attention plots
+head = 0
+# Shape: `(batch=1, num_heads, seq_len_q, seq_len_k)`.
+attention_heads = tf.squeeze(attention_weights, 0)
+attention = attention_heads[head]
+
+in_tokens = tf.convert_to_tensor([sentence])
+in_tokens = tokenizers.pt.tokenize(in_tokens).to_tensor()
+in_tokens = tokenizers.pt.lookup(in_tokens)[0]
+
+plot_attention_head(in_tokens, translated_tokens, attention)
+plot_attention_weights(sentence, translated_tokens,
+                       attention_weights[0], tokenizers)
